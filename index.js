@@ -8,11 +8,28 @@ class Block{
 		this.data = data;
 		this.prev_hash = prev_hash;
 		this.hash = this.calculateHash();
+    this.nonce = 0;
 	}
 	
-	calculateHash() {
-		return sha256(this.index + this.time + this.data + this.prev_hash).toString();
+	calculateHash(nonce) {
+		return sha256(this.index + this.time + this.data + this.prev_hash + nonce).toString();
 	}
+
+  mine() {
+    for(let i = 0; i < 1000000; i++)
+    {
+      if(this.calculateHash(i).startsWith("0000"))
+      {
+        this.nonce = i;
+        console.log("Block mined at nonce", i);
+        this.hash = this.calculateHash(i);
+        break;
+      }
+      else {
+      }
+    }
+    return this.calculateHash(this.nonce);
+  }
 }
 
 class Blockchain{
@@ -20,9 +37,9 @@ class Blockchain{
 	{
 		this.chain = [];
 	}
-	
+  
 	addBlock(block) {
-    block.calculateHash();
+    block.mine();
 		this.chain.push(block);
 	}
 	
@@ -32,6 +49,6 @@ class Blockchain{
 }
 
 var Coin = new Blockchain;
-Coin.addBlock(new Block(0, "Hello World", "0"));
+Coin.addBlock(new Block(0, "Ciao Mondo!", "0"));
 Coin.addBlock(new Block(1, "Second Block", Coin.prevHash()));
 console.log(JSON.stringify(Coin, 0, 32));
